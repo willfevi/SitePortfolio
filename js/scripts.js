@@ -1,14 +1,22 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const navLinks = document.querySelectorAll('nav ul li a');
+document.addEventListener('DOMContentLoaded', () => {
     const sections = document.querySelectorAll('section');
 
-    function activateLink() {
-        let len = sections.length;
-        while (--len && window.scrollY + 50 < sections[len].offsetTop) {}
-        navLinks.forEach(link => link.classList.remove('active'));
-        navLinks[len].classList.add('active');
-    }
+    const revealSection = (entries, observer) => {
+        const [entry] = entries;
 
-    activateLink();
-    window.addEventListener('scroll', activateLink);
+        if (!entry.isIntersecting) return;
+
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+    };
+
+    const sectionObserver = new IntersectionObserver(revealSection, {
+        root: null,
+        threshold: 0.15,
+    });
+
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+        section.classList.remove('visible'); // Ensure sections are hidden initially
+    });
 });
